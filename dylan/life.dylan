@@ -10,25 +10,31 @@ define function main (name :: <string>, arguments :: <vector>)
   local method display(b)
           for (i from 0 below n)
             for (j from 0 below m)
-              write-element(*standard-output*, if (b[i, j] == 0) ' ' else '*' end);
+              write-element(*standard-output*, if (b[i][j] == 0) ' ' else '*' end);
             end;
             new-line(*standard-output*);
           end;
         end method;
 
-  let b = make(<array>, dimensions: list(n, m), fill: 0);
-  b[19, 41] := 1;
-  b[20, 40] := 1;
-  b[21, 40] := 1;
-  b[22, 40] := 1;
-  b[22, 41] := 1;
-  b[22, 42] := 1;
-  b[22, 43] := 1;
-  b[19, 44] := 1;
+  let b = make(<vector>, size: n);
+  for (i from 0 below n)
+    b[i] := make(<vector>, size: m, fill: 0);
+  end;
+  b[19][41] := 1;
+  b[20][40] := 1;
+  b[21][40] := 1;
+  b[22][40] := 1;
+  b[22][41] := 1;
+  b[22][42] := 1;
+  b[22][43] := 1;
+  b[19][44] := 1;
   format-out("Before:\n");
   display(b);
 
-  let nextb = make(<array>, dimensions: list(n, m), fill: 0);
+  let nextb = make(<vector>, size: n);
+  for (i from 0 below n)
+    nextb[i] := make(<vector>, size: m, fill: 0);
+  end;
   let n-1 = n - 1;
   let m-1 = m - 1;
   for (k from 0 below g)
@@ -38,16 +44,16 @@ define function main (name :: <string>, arguments :: <vector>)
       for (j from 0 below m)
         let left = if (j == 0) m-1 else j - 1 end;
         let right = if (j == m-1) 0 else j + 1 end;
-        let count = b[up,   left ] +
-                    b[up,   j    ] +
-                    b[up,   right] +
-                    b[i,    right] +
-                    b[down, right] +
-                    b[down, j    ] +
-                    b[down, left ] +
-                    b[i,    left ];
-        nextb[i, j] := select (count)
-                         2 => b[i, j];   // stay the same
+        let count = b[up   ][left ] +
+                    b[up   ][j    ] +
+                    b[up   ][right] +
+                    b[i    ][right] +
+                    b[down ][right] +
+                    b[down ][j    ] +
+                    b[down ][left ] +
+                    b[i    ][left ];
+        nextb[i][j] := select (count)
+                         2 => b[i][j];   // stay the same
                          3 => 1;         // come alive
                          otherwise => 0; // die
                        end;
