@@ -2,6 +2,8 @@ Module: life
 Synopsis: Dylan implementation of life with no type declarations
 
 
+define constant <int-vector> = limited(<vector>, of: <integer>);
+
 define function main (name :: <string>, arguments :: <vector>)
   let n = 40;
   let m = 80;
@@ -18,7 +20,7 @@ define function main (name :: <string>, arguments :: <vector>)
 
   let b = make(<vector>, size: n);
   for (i from 0 below n)
-    b[i] := make(<vector>, size: m, fill: 0);
+    b[i] := make(<int-vector>, size: m, fill: 0);
   end;
   b[19][41] := 1;
   b[20][40] := 1;
@@ -31,9 +33,9 @@ define function main (name :: <string>, arguments :: <vector>)
   format-out("Before:\n");
   display(b);
 
-  let nextb = make(<vector>, size: n);
+  let nextb :: <vector> = make(<vector>, size: n);
   for (i from 0 below n)
-    nextb[i] := make(<vector>, size: m, fill: 0);
+    nextb[i] := make(<int-vector>, size: m, fill: 0);
   end;
   let n-1 = n - 1;
   let m-1 = m - 1;
@@ -44,14 +46,17 @@ define function main (name :: <string>, arguments :: <vector>)
       for (j from 0 below m)
         let left = if (j == 0) m-1 else j - 1 end;
         let right = if (j == m-1) 0 else j + 1 end;
-        let count = b[up   ][left ] +
-                    b[up   ][j    ] +
-                    b[up   ][right] +
-                    b[i    ][right] +
-                    b[down ][right] +
-                    b[down ][j    ] +
-                    b[down ][left ] +
-                    b[i    ][left ];
+        let bup :: <int-vector> = b[up];
+        let bi :: <int-vector> = b[i];
+        let bdown :: <int-vector> = b[down];
+        let count = bup  [left ] +
+                    bup  [j    ] +
+                    bup  [right] +
+                    bi   [right] +
+                    bdown[right] +
+                    bdown[j    ] +
+                    bdown[left ] +
+                    bi   [left ];
         nextb[i][j] := select (count)
                          2 => b[i][j];   // stay the same
                          3 => 1;         // come alive
